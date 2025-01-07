@@ -9,15 +9,18 @@ jobs:
   build:
     name: build and push
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [16, 18, 20, 22]
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: setup node
+      - name: setup node ${{ matrix.node }}
         uses: actions/setup-node@v4
 
         with:
-          node-version: 20
+          node-version: ${{ matrix.node }}
           cache: 'npm'
 
       - run: npm ci
