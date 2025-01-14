@@ -9,18 +9,19 @@ jobs:
   build:
     name: build and push
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: [16, 18, 20, 22]
+    # strategy:
+    #   matrix:
+    #     node: [16, 18, 20, 22]
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: setup node ${{ matrix.node }}
+      # - name: setup node ${{ matrix.node }}
+      - name: setup node
         uses: actions/setup-node@v4
 
         with:
-          node-version: ${{ matrix.node }}
+          # node-version: ${{ matrix.node }}
           cache: 'npm'
 
       - run: npm ci
@@ -38,8 +39,17 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: build docker image
-        run: docker build -t mdta023/ci-cd:${{ steps.generate_tag.outputs.sha }} .
+      # - name: build docker image
+      #   run: docker build -t mdta023/ci-cd:${{ steps.generate_tag.outputs.sha }} .
 
-      - name: push docker image
-        run: docker push mdta023/ci-cd:${{ steps.generate_tag.outputs.sha }}
+      # - name: push docker image
+      #   run: |
+      #     docker push mdta023/ci-cd:${{ steps.generate_tag.outputs.sha }}
+
+      - name: build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: mdta023/ci-cd:${{ steps.generate_tag.outputs.sha }}, mdta023/ci-cd:latest
