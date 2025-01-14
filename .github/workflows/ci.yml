@@ -32,5 +32,14 @@ jobs:
           SHA=$(echo $GITHUB_SHA | head -c7)
           echo "sha=$SHA" >> $GITHUB_OUTPUT
 
+      - name: login into the container registry
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: build docker image
-        run: docker build -t docker-ci-app:${{ steps.generate_tag.outputs.sha }} .
+        run: docker build -t mdta023/ci-cd:${{ steps.generate_tag.outputs.sha }} .
+
+      - name: push docker image
+        run: docker push mdta023/ci-cd:${{ steps.generate_tag.outputs.sha }}
